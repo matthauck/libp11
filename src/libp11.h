@@ -112,7 +112,14 @@ typedef struct PKCS11_ctx_st {
 	void *_private;
 } PKCS11_CTX;
 
-/**  PKCS11 pin callback */
+/**
+ * PKCS11 pin callbacks
+ *
+ * Note: only the slot id and slot labels are passed over the callbacks
+ * so as to not require an application to have the right definition of
+ * the entire PKCS11_SLOT, and this should be sufficient data to
+ * select the correct password to return.
+ */
 typedef const char*(*PKCS11_pin_get_callback)(void* data, CK_SLOT_ID slot_id, const char *slot_label, int so);
 typedef void(*PKCS11_pin_done_callback)(void* data, CK_SLOT_ID slot_id, const char *slot_label, int so);
 
