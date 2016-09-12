@@ -887,6 +887,11 @@ static int ctrl_set_pin(ENGINE_CTX *ctx, const char *pin)
 		errno = EINVAL;
 		return 0;
 	}
+	if (ctx->pin_callback) {
+		fprintf(stderr, "Specifying PIN and PIN_CALLBACK is not supported\n");
+		return 0;
+	}
+
 
 	/* Copy the PIN. If the string cannot be copied, NULL
 	 * shall be returned and errno shall be set. */
@@ -896,6 +901,24 @@ static int ctrl_set_pin(ENGINE_CTX *ctx, const char *pin)
 		ctx->pin_length = strlen(ctx->pin);
 
 	return ctx->pin != NULL;
+}
+
+static int ctrl_set_pin_callback(ENGINE_CTX *ctx, void* p)
+{
+	PKCS11_pin_callback pin_callback = (PKCS11_pin_callback) p;
+
+	/* Pre-condition check */
+	if (pin_callback == NULL) {
+		errno = EINVAL;
+		return 0;
+	}
+	if (ctx->pin) {
+		fprintf(stderr, "Specifying PIN and PIN_CALLBACK is not supported\n");
+		return 0;
+	}
+
+	ctx->pin_callback = pin_callback;
+	return ctx->pin_callback != NULL;
 }
 
 static int ctrl_inc_verbose(ENGINE_CTX *ctx)
@@ -921,6 +944,8 @@ int pkcs11_engine_ctrl(ENGINE_CTX *ctx, int cmd, long i, void *p, void (*f)())
 		return ctrl_set_module(ctx, (const char *)p);
 	case CMD_PIN:
 		return ctrl_set_pin(ctx, (const char *)p);
+	case CMD_PIN_CALLBACK:
+		return ctrl_set_pin_callback(ctx, p);
 	case CMD_VERBOSE:
 		return ctrl_inc_verbose(ctx);
 	case CMD_LOAD_CERT_CTRL:
