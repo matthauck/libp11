@@ -110,6 +110,9 @@ typedef struct PKCS11_ctx_st {
 	void *_private;
 } PKCS11_CTX;
 
+/**  PKCS11 pin callback */
+typedef const char*(*PKCS11_pin_callback)(PKCS11_SLOT *slot, int so);
+
 /**
  * Create a new libp11 context
  *
@@ -230,6 +233,17 @@ extern int PKCS11_is_logged_in(PKCS11_SLOT * slot, int so, int * res);
  * @retval -1 error
  */
 extern int PKCS11_login(PKCS11_SLOT * slot, int so, const char *pin);
+
+/**
+ * Authenticate to the card
+ *
+ * @param slot slot returned by PKCS11_find_token()
+ * @param so login as CKU_SO if != 0, otherwise login as CKU_USER
+ * @param pin_callback Callback that returns a PIN value for this slot
+ * @retval 0 success
+ * @retval -1 error
+ */
+extern int PKCS11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_pin_callback pin_callback);
 
 /**
  * De-authenticate from the card
@@ -468,7 +482,7 @@ P11_DEPRECATED_FUNC extern int PKCS11_private_encrypt(
  */
 P11_DEPRECATED_FUNC extern int PKCS11_private_decrypt(
 	int flen, const unsigned char *from,
-	unsigned char *to, PKCS11_KEY * key, int padding); 
+	unsigned char *to, PKCS11_KEY * key, int padding);
 
 /*
  * Function and reason codes
