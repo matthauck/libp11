@@ -24,6 +24,8 @@
 #ifndef _LIB11_H
 #define _LIB11_H
 
+#include "pkcs11.h"
+
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/bn.h>
@@ -111,8 +113,8 @@ typedef struct PKCS11_ctx_st {
 } PKCS11_CTX;
 
 /**  PKCS11 pin callback */
-typedef const char*(*PKCS11_pin_get_callback)(void* userData, PKCS11_SLOT *slot, int so);
-typedef void(*PKCS11_pin_done_callback)(void* userData, PKCS11_SLOT *slot, int so);
+typedef const char*(*PKCS11_pin_get_callback)(void* data, CK_SLOT_ID slot_id, const char *slot_label, int so);
+typedef void(*PKCS11_pin_done_callback)(void* data, CK_SLOT_ID slot_id, const char *slot_label, int so);
 
 /** PKCS11 login callback struct */
 typedef struct PKCS11_login_callbacks_st {

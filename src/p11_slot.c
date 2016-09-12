@@ -252,7 +252,8 @@ int pkcs11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_LOGIN_CALLBACKS * c
 		return -1;
 	}
 
-	pin = callbacks->pin_get(callbacks->pin_get_data, slot, so);
+	pin = callbacks->pin_get(callbacks->pin_get_data, spriv->id,
+		(slot->token ? slot->token->label : NULL), so);
 
 	rv = CRYPTOKI_call(ctx,
 		C_Login(spriv->session, so ? CKU_SO : CKU_USER,
@@ -260,7 +261,8 @@ int pkcs11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_LOGIN_CALLBACKS * c
 
 	// mark pin as done being used
 	if (callbacks->pin_done) {
-		callbacks->pin_done(callbacks->pin_done_data, slot, so);
+		callbacks->pin_done(callbacks->pin_done_data, spriv->id,
+			(slot->token ? slot->token->label : NULL), so);
 	}
 
 	if (rv && rv != CKR_USER_ALREADY_LOGGED_IN) /* logged in -> OK */

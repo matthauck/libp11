@@ -333,7 +333,8 @@ int pkcs11_authenticate(PKCS11_KEY *key)
 		return 0;
 
 	if (spriv->prev_callbacks) {
-		pin = spriv->prev_callbacks->pin_get(spriv->prev_callbacks->pin_get_data, slot, spriv->prev_so);
+		pin = spriv->prev_callbacks->pin_get(spriv->prev_callbacks->pin_get_data, spriv->id,
+			(slot->token ? slot->token->label : NULL), spriv->prev_so);
 	} else {
 		pin = spriv->prev_pin;
 	}
@@ -346,7 +347,8 @@ int pkcs11_authenticate(PKCS11_KEY *key)
 		rv = 0;
 
 	if (spriv->prev_callbacks && spriv->prev_callbacks->pin_done) {
-		spriv->prev_callbacks->pin_done(spriv->prev_callbacks->pin_done_data, slot, spriv->prev_so);
+		spriv->prev_callbacks->pin_done(spriv->prev_callbacks->pin_done_data, spriv->id,
+			(slot->token ? slot->token->label : NULL), spriv->prev_so);
 	}
 
 	return rv;
