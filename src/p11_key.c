@@ -346,7 +346,7 @@ int pkcs11_authenticate(PKCS11_KEY *key)
 		rv = 0;
 
 	if (spriv->prev_callbacks && spriv->prev_callbacks->pin_done) {
-		pin = spriv->prev_callbacks->pin_done(spriv->prev_callbacks->pin_done_data, slot, spriv->prev_so);
+		spriv->prev_callbacks->pin_done(spriv->prev_callbacks->pin_done_data, slot, spriv->prev_so);
 	}
 
 	return rv;

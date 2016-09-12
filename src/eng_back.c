@@ -915,7 +915,7 @@ static int ctrl_set_pin(ENGINE_CTX *ctx, const char *pin)
 
 static int ctrl_set_pin_get_callback(ENGINE_CTX *ctx, void* data, void(*func)())
 {
-	PKCS11_pin_callback pin_callback = (PKCS11_pin_callback) func;
+	PKCS11_pin_get_callback pin_callback = (PKCS11_pin_get_callback) func;
 
 	/* Pre-condition check */
 	if (pin_callback == NULL) {
@@ -935,7 +935,7 @@ static int ctrl_set_pin_get_callback(ENGINE_CTX *ctx, void* data, void(*func)())
 
 static int ctrl_set_pin_done_callback(ENGINE_CTX *ctx, void* data, void(*func)())
 {
-	PKCS11_pin_callback pin_callback = (PKCS11_pin_callback) func;
+	PKCS11_pin_done_callback pin_callback = (PKCS11_pin_done_callback) func;
 
 	/* Pre-condition check */
 	if (pin_callback == NULL) {
