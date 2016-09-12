@@ -236,31 +236,38 @@ int pkcs11_login(PKCS11_SLOT * slot, int so, const char *pin, int relogin)
 		}
 		spriv->prev_pin = OPENSSL_strdup(pin);
 	}
-	spriv->prev_pin_callback = NULL;
+	spriv->prev_callbacks = NULL;
 	spriv->prev_so = so;
 	return 0;
 }
 
-int pkcs11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_pin_callback pin_callback, int relogin)
+int pkcs11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_LOGIN_CALLBACKS * callbacks, int relogin)
 {
 	PKCS11_CTX *ctx = SLOT2CTX(slot);
 	PKCS11_SLOT_private *spriv = PRIVSLOT(slot);
 	int rv, prep;
+	const char* pin;
 
 	if (login_prep(slot, so, relogin) < 0) {
 		return -1;
 	}
 
-	const char* pin = pin_callback(slot, so);
+	pin = callbacks->pin_get(callbacks->pin_get_data, slot, so);
 
 	rv = CRYPTOKI_call(ctx,
 		C_Login(spriv->session, so ? CKU_SO : CKU_USER,
 			(CK_UTF8CHAR *) pin, pin ? (unsigned long) strlen(pin) : 0));
+
+	// mark pin as done being used
+	if (callbacks->pin_done) {
+		callbacks->pin_done(callbacks->pin_done_data, slot, so);
+	}
+
 	if (rv && rv != CKR_USER_ALREADY_LOGGED_IN) /* logged in -> OK */
 		CRYPTOKI_checkerr(PKCS11_F_PKCS11_LOGIN, rv);
 	spriv->loggedIn = 1;
 	spriv->prev_pin = NULL;
-	spriv->prev_pin_callback = pin_callback;
+	spriv->prev_callbacks = callbacks;
 	spriv->prev_so = so;
 	return 0;
 }
@@ -273,8 +280,8 @@ int pkcs11_relogin(PKCS11_SLOT * slot)
 {
 	PKCS11_SLOT_private *spriv = PRIVSLOT(slot);
 
-	if (spriv->prev_pin_callback) {
-		return pkcs11_login_callback(slot, spriv->prev_so, spriv->prev_pin_callback, 1);
+	if (spriv->prev_callbacks) {
+		return pkcs11_login_callback(slot, spriv->prev_so, spriv->prev_callbacks, 1);
 	} else {
 		return pkcs11_login(slot, spriv->prev_so, spriv->prev_pin, 1);
 	}
@@ -451,7 +458,7 @@ static int pkcs11_init_slot(PKCS11_CTX * ctx, PKCS11_SLOT * slot, CK_SLOT_ID id)
 	spriv->forkid = PRIVCTX(ctx)->forkid;
 	spriv->prev_rw = 0;
 	spriv->prev_pin = NULL;
-	spriv->prev_pin_callback = NULL;
+	spriv->prev_callbacks = NULL;
 	spriv->prev_so = 0;
 	spriv->rwlock = CRYPTO_THREAD_lock_new();
 

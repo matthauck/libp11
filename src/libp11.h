@@ -111,7 +111,19 @@ typedef struct PKCS11_ctx_st {
 } PKCS11_CTX;
 
 /**  PKCS11 pin callback */
-typedef const char*(*PKCS11_pin_callback)(PKCS11_SLOT *slot, int so);
+typedef const char*(*PKCS11_pin_callback)(void* userData, PKCS11_SLOT *slot, int so);
+
+/** PKCS11 login callback struct */
+typedef struct PKCS11_login_callbacks_st {
+	// callback to get a pin for a given slot
+	PKCS11_pin_callback pin_get;
+	// application data that corresponds to the pin_get callback
+	void* pin_get_data;
+	// callback indicate a retrieved pin is finished being used
+	PKCS11_pin_callback pin_done;
+	// application data that corresponds to the pin_done callback
+	void* pin_done_data;
+} PKCS11_LOGIN_CALLBACKS;
 
 /**
  * Create a new libp11 context
@@ -239,11 +251,11 @@ extern int PKCS11_login(PKCS11_SLOT * slot, int so, const char *pin);
  *
  * @param slot slot returned by PKCS11_find_token()
  * @param so login as CKU_SO if != 0, otherwise login as CKU_USER
- * @param pin_callback Callback that returns a PIN value for this slot
+ * @param callbacks Callback configuration for returning/clearing PINs
  * @retval 0 success
  * @retval -1 error
  */
-extern int PKCS11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_pin_callback pin_callback);
+extern int PKCS11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_LOGIN_CALLBACKS * callbacks);
 
 /**
  * De-authenticate from the card

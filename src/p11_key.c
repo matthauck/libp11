@@ -332,8 +332,8 @@ int pkcs11_authenticate(PKCS11_KEY *key)
 	if (!kpriv->always_authenticate)
 		return 0;
 
-	if (spriv->prev_pin_callback) {
-		pin = spriv->prev_pin_callback(slot, spriv->prev_so);
+	if (spriv->prev_callbacks) {
+		pin = spriv->prev_callbacks->pin_get(spriv->prev_callbacks->pin_get_data, slot, spriv->prev_so);
 	} else {
 		pin = spriv->prev_pin;
 	}
@@ -344,6 +344,11 @@ int pkcs11_authenticate(PKCS11_KEY *key)
 			pin ? strlen(pin) : 0));
 	if (rv == CKR_USER_ALREADY_LOGGED_IN) /* ignore */
 		rv = 0;
+
+	if (spriv->prev_callbacks && spriv->prev_callbacks->pin_done) {
+		pin = spriv->prev_callbacks->pin_done(spriv->prev_callbacks->pin_done_data, slot, spriv->prev_so);
+	}
+
 	return rv;
 }
 
