@@ -216,7 +216,7 @@ int pkcs11_login(PKCS11_SLOT * slot, int so, const char *pin, int relogin)
 {
 	PKCS11_CTX *ctx = SLOT2CTX(slot);
 	PKCS11_SLOT_private *spriv = PRIVSLOT(slot);
-	int rv, prep;
+	int rv;
 
 	if (login_prep(slot, so, relogin) < 0) {
 		return -1;
