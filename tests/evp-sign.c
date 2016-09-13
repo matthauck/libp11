@@ -241,6 +241,7 @@ int main(int argc, char **argv)
 			display_openssl_errors(__LINE__);
 			exit(1);
 		}
+		break;
 	case BY_CALLBACK:
 		pin_done.done = 0;
 		if (!ENGINE_ctrl_cmd(e, "PIN_GET_CALLBACK", 0, key_pass, &pin_get_callback, 0)) {
@@ -251,6 +252,7 @@ int main(int argc, char **argv)
 			display_openssl_errors(__LINE__);
 			exit(1);
 		}
+		break;
 	default: /* NONE */
 		break;
 	}
