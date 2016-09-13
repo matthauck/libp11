@@ -125,14 +125,10 @@ typedef void(*PKCS11_pin_done_callback)(void* data, CK_SLOT_ID slot_id, const ch
 
 /** PKCS11 login callback struct */
 typedef struct PKCS11_login_callbacks_st {
-	// callback to get a pin for a given slot
-	PKCS11_pin_get_callback pin_get;
-	// application data that corresponds to the pin_get callback
-	void* pin_get_data;
-	// callback indicate a retrieved pin is finished being used
-	PKCS11_pin_done_callback pin_done;
-	// application data that corresponds to the pin_done callback
-	void* pin_done_data;
+	PKCS11_pin_get_callback pin_get;      /** callback to get a pin for a given slot */
+	void* pin_get_data; 				  /** application data that corresponds to the pin_get callback */
+	PKCS11_pin_done_callback pin_done; 	  /** callback indicate a retrieved pin is finished being used */
+	void* pin_done_data; 				  /** application data that corresponds to the pin_done callback */
 } PKCS11_LOGIN_CALLBACKS;
 
 /**
