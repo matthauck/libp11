@@ -245,7 +245,7 @@ int pkcs11_login_callback(PKCS11_SLOT * slot, int so, PKCS11_LOGIN_CALLBACKS * c
 {
 	PKCS11_CTX *ctx = SLOT2CTX(slot);
 	PKCS11_SLOT_private *spriv = PRIVSLOT(slot);
-	int rv, prep;
+	int rv;
 	const char* pin;
 
 	if (login_prep(slot, so, relogin) < 0) {
